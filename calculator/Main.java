@@ -10,7 +10,7 @@ public class Main {
     static String operationType;
 
     public static void main(String[] args) {
-        System.out.println("Enter a mathematical expression that matches the conditions");
+        System.out.println("Enter a mathematical expression that matches the conditions: ");
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine().replaceAll("\\s", "");
         String output = calc(input);
@@ -29,25 +29,30 @@ public class Main {
         } else if (input.contains("*")) {
             operationType = "*";
         } else {
-            throw new RuntimeException("Incorrect operation type");
+            throw new RuntimeException("It isn't mathematical operation");
         }
 
-        String[] inputArray = input.split("[+-/*]");
+        String checkingString = input + "1"; /* данная стринга необходима. Так как при сплите, например, такого
+        выражения  "1+2+", мы бы получили массив длиной 2.  И запустилось бы дальнейшее вычисление выражения,
+        оутпут был бы "3". А после прибавления к  1+2+" + "1" мы получим массив длиной 3.*/
 
-        if (inputArray.length != 3) {
+        String[] checkingArray = checkingString.split("[-/+*]");
+        if (checkingArray.length != 2) {
             throw new RuntimeException("Incorrect input");
         }
+
+        String[] inputArray = input.split("[-/+*]");
 
         String calculator = kindOfCalc(inputArray);
 
         String romNum1 = inputArray[0];
-        String romNum2 = inputArray[2];
+        String romNum2 = inputArray[1];
 
         if (calculator.equals(ROMAN_CALC)) {
             output = romanCalculating(romNum1, romNum2, operationType);
         } else {
             int arabNum1 = Integer.parseInt(inputArray[0]);
-            int arabNum2 = Integer.parseInt(inputArray[2]);
+            int arabNum2 = Integer.parseInt(inputArray[1]);
             output = String.valueOf(calculating(arabNum1, arabNum2, operationType));
         }
         return output;
@@ -63,7 +68,7 @@ public class Main {
             if (s.equals(array[0])) {
                 b1Arab = true;
             }
-            if (s.equals(array[2])) {
+            if (s.equals(array[1])) {
                 b2Arab = true;
             }
         }
@@ -71,7 +76,7 @@ public class Main {
             if (s.equals(array[0])) {
                 b1Rom = true;
             }
-            if (s.equals(array[2])) {
+            if (s.equals(array[1])) {
                 b2Rom = true;
             }
         }
@@ -91,11 +96,15 @@ public class Main {
         int result = 0;
         if (operation.equals("-")) {
             if (num1 <= num2) {
-                throw new RuntimeException("Incorrect output");
+                throw new RuntimeException("Incorrect output. There are no negative numbers in the Roman system");
+            } else {
+                result = calculating(num1, num2, operation);
             }
         } else if (operation.equals("/")) {
             if (num1 < num2) {
-                throw new RuntimeException("Incorrect output");
+                throw new RuntimeException("Incorrect output. There are no negative numbers in the Roman system");
+            } else {
+                result = calculating(num1, num2, operation);
             }
         } else {
             result = calculating(num1, num2, operation);
@@ -106,12 +115,9 @@ public class Main {
 
     private static int convertRomanToArabian(String romNum) {
         int arabNum = 0;
-        for (String s : ARABIAN_ARRAY) {
-            if (s.equals(romNum)) {
-                arabNum = Integer.parseInt(s);
-            } else {
-                throw new RuntimeException("Incorrect input"); // Данное исключение никогда не будет выброшено, так как в методе
-                // kindOfCalc осуществлялась проверка на корректность ввода чисел.
+        for (int i = 0; i < ROMAN_ARRAY.length; i++) {
+            if (romNum.equals(ROMAN_ARRAY[i])) {
+                arabNum = Integer.parseInt(ARABIAN_ARRAY[i]);
             }
         }
         return arabNum;
@@ -148,7 +154,7 @@ public class Main {
                 break;
             default:
                 throw new IllegalArgumentException("Incorrect operation type");  // Данное исключение никогда не будет
-                // выброшено, так как выше делалась проверка на крректность знака операции.
+                // выброшено, так как выше делалась проверка на корректность знака операции.
         }
         return result;
     }
